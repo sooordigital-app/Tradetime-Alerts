@@ -924,11 +924,16 @@
             renderAlerts();
             setupEventListeners();
             initAlarmTone();
+            syncAlertsToNative();
+            pullPendingSignalsFromNative();
 
-            // Restore the tab title once the user comes back to this tab/window
+            // Restore the tab title once the user comes back to this tab/window,
+            // and pick up any alerts the native background service fired
+            // while the app was minimized / screen was off.
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
                     document.title = originalTitle;
+                    pullPendingSignalsFromNative();
                 }
             });
 
@@ -983,6 +988,14 @@
                     localStorage.setItem('alarm-tone-uri', result.uri);
                     localStorage.setItem('alarm-tone-title', result.title || 'Selected tone');
                     document.getElementById('current-tone-label').textContent = `🎵 Current tone: ${result.title || 'Selected tone'}`;
+
+                    // Also save it natively so the background service (which
+                    // has no access to this page's localStorage) can play
+                    // the same tone when it fires an alert on its own.
+                    const monitorPlugin = getAlertMonitorPlugin();
+                    if (monitorPlugin) {
+                        monitorPlugin.setAlarmTone({ uri: result.uri }).catch(e => console.log('setAlarmTone failed:', e));
+                    }
                 }
             } catch (e) {
                 // User backed out of the picker without choosing a tone — ignore.
@@ -1582,6 +1595,11 @@
             localStorage.setItem('alerts-history', JSON.stringify(
                 history.map(h => ({...h, time: h.time.toISOString()}))
             ));
+            // Keep the native background service (if running inside the
+            // Android app) up to date with the current alert list so it can
+            // keep monitoring even while the screen is off / app is not in
+            // the foreground.
+            syncAlertsToNative();
         }
 
         function loadFromStorage() {
@@ -1597,6 +1615,75 @@
                     ...h,
                     time: new Date(h.time)
                 }));
+            }
+        }
+
+        // ===== NATIVE BACKGROUND MONITORING (Android app only) =====
+        // A separate native Android Service (AlertMonitorService) does the
+        // actual EMA / candle-cross checking + tone playback while the app
+        // is backgrounded or the screen is off — something a WebView's
+        // JS timers cannot reliably do on their own. This section just
+        // keeps that native service in sync with what's shown here.
+        function getAlertMonitorPlugin() {
+            return (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AlertMonitor) || null;
+        }
+
+        function syncAlertsToNative() {
+            if (!isNativeApp()) return;
+            const plugin = getAlertMonitorPlugin();
+            if (!plugin) return;
+
+            const payload = alerts.map(a => ({
+                id: a.id,
+                symbol: a.symbol,
+                marketType: a.marketType,
+                timeframe: a.timeframe,
+                ema1: a.ema1,
+                ema2: a.ema2,
+                active: a.active,
+                enableSound: a.enableSound,
+                enablePopup: a.enablePopup
+            }));
+
+            plugin.sync({ alerts: payload }).catch(e => console.log('Native alert sync failed:', e));
+        }
+
+        // Any signal that fired natively while the app was backgrounded gets
+        // queued on the native side. Pull it in and merge it into the
+        // on-screen history whenever the app comes back to the foreground.
+        async function pullPendingSignalsFromNative() {
+            if (!isNativeApp()) return;
+            const plugin = getAlertMonitorPlugin();
+            if (!plugin) return;
+
+            try {
+                const result = await plugin.getPendingSignals();
+                const signals = (result && result.signals) || [];
+                if (!signals.length) return;
+
+                signals.forEach(s => {
+                    history.unshift({
+                        id: `${Date.now()}-${Math.random()}`,
+                        pair: s.symbol,
+                        signal: s.signal,
+                        type: s.type,
+                        price: s.price,
+                        ema1: Number(s.ema1).toFixed(2),
+                        ema2: Number(s.ema2).toFixed(2),
+                        time: new Date(s.time),
+                        timeframe: s.timeframe
+                    });
+                });
+
+                if (history.length > 100) history.length = 100;
+                signalsToday += signals.length;
+
+                localStorage.setItem('alerts-history', JSON.stringify(
+                    history.map(h => ({...h, time: h.time.toISOString()}))
+                ));
+                renderHistory();
+            } catch (e) {
+                console.log('pullPendingSignalsFromNative failed:', e);
             }
         }
 
