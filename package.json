@@ -1,0 +1,17 @@
+{
+  "name": "tradetime-alerts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TradeTime EMA Alerts wrapped as an Android app with Capacitor.",
+  "scripts": {
+    "sync": "npx cap sync android",
+    "open:android": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "appId": "com.tradetime.alerts",
+  "appName": "TradeTime Alerts",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true
+  }
+}

@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EMA Crossover Desktop Alert System - Real-time Binance data with popup alerts">
+    <title>EMA Desktop Alert System</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTI3NDQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGYxNzJhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJiZWxsIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMGQ0ZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDBmZjg4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0idXJsKCNiZykiLz4KICA8cGF0aCBkPSJNMzIgMTFjLTIuMSAwLTMuOCAxLjctMy44IDMuOHYxLjZjLTYuNCAxLjQtMTEuMiA3LjEtMTEuMiAxMy45djcuOGwtMy42IDUuOWgzNy4ybC0zLjYtNS45di03LjhjMC02LjgtNC44LTEyLjUtMTEuMi0xMy45di0xLjZjMC0yLjEtMS43LTMuOC0zLjgtMy44eiIgZmlsbD0idXJsKCNiZWxsKSIvPgogIDxwYXRoIGQ9Ik0yNS41IDQ2LjJhNi41IDYuNSAwIDAgMCAxMyAweiIgZmlsbD0idXJsKCNiZWxsKSIvPgogIDxjaXJjbGUgY3g9IjQ2IiBjeT0iMTciIHI9IjcuNSIgZmlsbD0iI2ZmMzM2NiIgc3Ryb2tlPSIjMGYxNzJhIiBzdHJva2Utd2lkdGg9IjIuNSIvPgo8L3N2Zz4=">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #0099cc;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --warning: #ffaa00;
+            --bg: #0f172a;
+            --surface: #1a2744;
+            --surface-light: #243456;
+            --text: #e0e7ff;
+            --text-dim: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #1a2f4f 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 255, 136, 0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== LEFT PANEL - ADD ALERT ===== */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.85rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: var(--bg);
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* ===== ALERTS TABLE ===== */
+        .alerts-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .alerts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .alerts-header h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alerts-count {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .alerts-status-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-card {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .status-card-label {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-card-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .alerts-table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        thead {
+            background: rgba(0, 212, 255, 0.05);
+            border-bottom: 2px solid var(--border);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        tbody tr {
+            transition: all 0.2s;
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .pair-name {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .badge-spot {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .badge-futures {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .badge-active {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .badge-paused {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+
+        .ema-display {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            background: var(--surface-light);
+            padding: 0.5rem;
+            border-radius: 4px;
+            color: var(--success);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .btn-toggle {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-toggle:hover {
+            background: var(--primary);
+            color: var(--bg);
+        }
+
+        .btn-delete {
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-dim);
+        }
+
+        .empty-state-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== BOTTOM STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .stat-card h3 {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        /* ===== ALERT POPUP ===== */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .alert-popup {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+            animation: popupBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-popup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes popupBounce {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .alert-popup.bullish {
+            border-color: var(--success);
+        }
+
+        .alert-popup.bearish {
+            border-color: var(--danger);
+        }
+
+        .alert-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .alert-popup h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .alert-popup.bullish h1 {
+            color: var(--success);
+        }
+
+        .alert-popup.bearish h1 {
+            color: var(--danger);
+        }
+
+        .alert-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .popup-buttons button {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-close {
+            background: var(--surface-light);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-close:hover {
+            background: var(--border);
+        }
+
+        .btn-acknowledge {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: var(--bg);
+        }
+
+        .btn-acknowledge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .history-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .history-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: var(--surface-light);
+            border-left: 4px solid var(--primary);
+            border-radius: 6px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item.bullish {
+            border-left-color: var(--success);
+        }
+
+        .history-item.bearish {
+            border-left-color: var(--danger);
+        }
+
+        .history-signal {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-signal.bullish {
+            color: var(--success);
+        }
+
+        .history-signal.bearish {
+            color: var(--danger);
+        }
+
+        .history-time {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        .no-history {
+            text-align: center;
+            color: var(--text-dim);
+            padding: 2rem;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1 class="title">📊 EMA Desktop Alert System</h1>
+            <p class="subtitle">Real-time EMA Crossover Alerts with Full-Screen Popup Alerts</p>
+            <div id="tone-picker-row" style="margin-top:1rem; display:flex; align-items:center; justify-content:center; gap:0.75rem; flex-wrap:wrap;">
+                <button class="btn btn-primary" id="pick-tone-btn" onclick="pickAlarmTone()" style="width:auto; margin-top:0; padding:0.6rem 1.2rem;">
+                    🔔 Set Phone Alarm Tone
+                </button>
+                <span id="current-tone-label" style="color: var(--text-dim); font-size: 0.9rem;">No tone selected — using default beep</span>
+            </div>
+        </header>
+
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+            <!-- LEFT: ADD ALERT FORM -->
+            <div class="panel">
+                <h2>➕ Add New Alert</h2>
+
+                <div class="form-group">
+                    <label for="symbol">Trading Pair</label>
+                    <select id="symbol">
+                        <option value="">-- Select Pair --</option>
+                        <option value="BTCUSDT">BTC/USDT</option>
+                        <option value="ETHUSDT">ETH/USDT</option>
+                        <option value="BNBUSDT">BNB/USDT</option>
+                        <option value="SOLUSDT">SOL/USDT</option>
+                        <option value="ADAUSDT">ADA/USDT</option>
+                        <option value="DOGEUSDT">DOGE/USDT</option>
+                        <option value="LINKUSDT">LINK/USDT</option>
+                        <option value="XRPUSDT">XRP/USDT</option>
+                        <option value="LTCUSDT">LTC/USDT</option>
+                        <option value="MATICUSDT">MATIC/USDT</option>
+                        <option value="AVAXUSDT">AVAX/USDT</option>
+                        <option value="FTMUSDT">FTM/USDT</option>
+                        <option value="SUIUSDT">SUI/USDT</option>
+                        <option value="DASHUSDT">DASH/USDT</option>
+                        <option value="ZECUSDT">ZEC/USDT</option>
+                        <option value="TAOUSDT">TAO/USDT</option>
+                        <option value="NEARUSDT">NEAR/USDT</option>
+                        <option value="custom">➕ Custom Pair</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="symbol-custom-group" style="display: none;">
+                    <label for="symbol-custom">Custom Pair (Binance Symbol)</label>
+                    <input type="text" id="symbol-custom" placeholder="E.g., PEPEUSDT">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="selectAllCoins">
+                    <label for="selectAllCoins" style="margin: 0;">✅ Select All Coins (add every coin above as an alert)</label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ema1">Fast EMA</label>
+                        <select id="ema1">
+                            <option value="5">EMA 5</option>
+                            <option value="9" selected>EMA 9</option>
+                            <option value="12">EMA 12</option>
+                            <option value="20">EMA 20</option>
+                            <option value="21">EMA 21</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="ema1-custom-group" style="display: none;">
+                        <label for="ema1-custom">Custom Value</label>
+                        <input type="number" id="ema1-custom" placeholder="E.g., 7" min="2" max="500">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ema2">Slow EMA</label>
+                        <select id="ema2">
+                            <option value="21" selected>EMA 21</option>
+                            <option value="50">EMA 50</option>
+                            <option value="100">EMA 100</option>
+                            <option value="200">EMA 200</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="ema2-custom-group" style="display: none;">
+                        <label for="ema2-custom">Custom Value</label>
+                        <input type="number" id="ema2-custom" placeholder="E.g., 25" min="2" max="500">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="timeframe">Timeframe</label>
+                    <select id="timeframe">
+                        <option value="1m">1 Minute</option>
+                        <option value="3m">3 Minutes</option>
+                        <option value="5m">5 Minutes</option>
+                        <option value="15m">15 Minutes</option>
+                        <option value="30m">30 Minutes</option>
+                        <option value="1h" selected>1 Hour</option>
+                        <option value="2h">2 Hours</option>
+                        <option value="4h">4 Hours</option>
+                        <option value="6h">6 Hours</option>
+                        <option value="1d">1 Day</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="marketType">Market Type</label>
+                    <select id="marketType">
+                        <option value="spot" selected>Spot</option>
+                        <option value="futures">Futures</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="enablePopup" checked>
+                    <label for="enablePopup" style="margin: 0;">🔔 Full-Screen Popup</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="enableSound" checked>
+                    <label for="enableSound" style="margin: 0;">🔊 Sound Alert</label>
+                </div>
+
+                <button class="btn btn-primary" onclick="addAlert()">+ Add Alert</button>
+            </div>
+
+            <!-- RIGHT: ALERTS TABLE -->
+            <div class="alerts-container">
+                <div class="alerts-header">
+                    <h2>🎯 Active Alerts</h2>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <button class="btn-small btn-delete" style="width:auto;" onclick="deleteSelectedAlerts()">🗑 Delete Selected</button>
+                        <span class="alerts-count" id="alerts-count">0</span>
+                    </div>
+                </div>
+
+                <div class="alerts-status-bar">
+                    <div class="status-card">
+                        <div class="status-card-label">Total Alerts</div>
+                        <div class="status-card-value" id="total-alerts">0</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-card-label">Active</div>
+                        <div class="status-card-value" id="active-alerts">0</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-card-label">Signals Today</div>
+                        <div class="status-card-value" id="signals-today">0</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-card-label">Last Signal</div>
+                        <div class="status-card-value" id="last-signal-time" style="font-size: 0.9rem;">--:--</div>
+                    </div>
+                </div>
+
+                <div class="alerts-table-container">
+                    <table id="alerts-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-alerts" onclick="toggleSelectAllAlerts(this)"></th>
+                                <th>Pair</th>
+                                <th>EMAs</th>
+                                <th>Timeframe</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alerts-tbody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 2rem;">
+                                    <div class="empty-state-icon">🚀</div>
+                                    <p>No alerts yet. Add one to get started!</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="history-section">
+            <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 1.5rem;">
+                <h2 style="margin-bottom:0;">📜 Alert History</h2>
+                <button class="btn-small btn-delete" style="width:auto;" onclick="clearHistory()">🗑 Clear History</button>
+            </div>
+            <div class="history-list" id="history-list">
+                <div class="no-history">No signals triggered yet</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERT POPUP -->
+    <div class="popup-overlay" id="popup-overlay">
+        <div class="alert-popup" id="alert-popup">
+            <div class="alert-icon" id="popup-icon">🎯</div>
+            <h1 id="popup-title">BULLISH SIGNAL</h1>
+            
+            <div class="alert-details">
+                <div class="detail-row">
+                    <div>
+                        <div class="detail-label">Trading Pair</div>
+                        <div class="detail-value" id="popup-pair">BTC/USDT</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Timeframe</div>
+                        <div class="detail-value" id="popup-timeframe">1H</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div>
+                        <div class="detail-label">Current Price</div>
+                        <div class="detail-value" id="popup-price">$45,000</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Time</div>
+                        <div class="detail-value" id="popup-time">14:30:00</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div>
+                        <div class="detail-label">EMA Values</div>
+                        <div class="detail-value" id="popup-ema">EMA 9/21</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Action</div>
+                        <div class="detail-value" id="popup-action">BUY</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup-buttons">
+                <button class="btn-small btn-close" onclick="closePopup()">Close</button>
+                <button class="btn-small btn-acknowledge" onclick="acknowledgeAlert()">✓ Acknowledged</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== STATE & CONFIG =====
+        let alerts = [];
+        let history = [];
+        let alertIntervals = {};
+        let signalsToday = 0;
+        const originalTitle = document.title;
+
+        // ===== INITIALIZATION =====
+        function init() {
+            loadFromStorage();
+            renderAlerts();
+            setupEventListeners();
+            initAlarmTone();
+
+            // Restore the tab title once the user comes back to this tab/window
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    document.title = originalTitle;
+                }
+            });
+
+            // Start monitoring all alerts
+            alerts.forEach(alert => {
+                if (alert.active) startMonitoring(alert);
+            });
+        }
+
+        // ===== PHONE ALARM TONE (native Android app only) =====
+        // Uses a small custom Capacitor plugin ("AlarmSound") added to the
+        // Android project. In a normal browser this plugin doesn't exist,
+        // so everything here quietly falls back to the existing Web Audio
+        // beep — nothing breaks when this file is just opened in a browser.
+        function isNativeApp() {
+            return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+        }
+
+        function getAlarmSoundPlugin() {
+            return (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AlarmSound) || null;
+        }
+
+        function initAlarmTone() {
+            const label = document.getElementById('current-tone-label');
+            const btn = document.getElementById('pick-tone-btn');
+
+            if (!isNativeApp()) {
+                // Running in a normal browser (e.g. testing this HTML file) —
+                // hide the picker since there's no phone tone list to pick from.
+                if (btn) btn.style.display = 'none';
+                if (label) label.textContent = 'Alarm tone picker works inside the Android app';
+                return;
+            }
+
+            const savedTitle = localStorage.getItem('alarm-tone-title');
+            if (label) {
+                label.textContent = savedTitle
+                    ? `🎵 Current tone: ${savedTitle}`
+                    : 'No tone selected — using default beep';
+            }
+        }
+
+        async function pickAlarmTone() {
+            const plugin = getAlarmSoundPlugin();
+            if (!plugin) {
+                alert('Alarm tone picker is only available inside the installed Android app.');
+                return;
+            }
+            try {
+                const result = await plugin.pickRingtone();
+                if (result && result.uri) {
+                    localStorage.setItem('alarm-tone-uri', result.uri);
+                    localStorage.setItem('alarm-tone-title', result.title || 'Selected tone');
+                    document.getElementById('current-tone-label').textContent = `🎵 Current tone: ${result.title || 'Selected tone'}`;
+                }
+            } catch (e) {
+                // User backed out of the picker without choosing a tone — ignore.
+                console.log('Tone picker cancelled or failed:', e);
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('ema1').addEventListener('change', (e) => {
+                const group = document.getElementById('ema1-custom-group');
+                group.style.display = e.target.value === 'custom' ? 'block' : 'none';
+            });
+
+            document.getElementById('ema2').addEventListener('change', (e) => {
+                const group = document.getElementById('ema2-custom-group');
+                group.style.display = e.target.value === 'custom' ? 'block' : 'none';
+            });
+
+            document.getElementById('symbol').addEventListener('change', (e) => {
+                const group = document.getElementById('symbol-custom-group');
+                group.style.display = e.target.value === 'custom' ? 'block' : 'none';
+            });
+
+            // When "Select All Coins" is checked, the single pair dropdown is not needed
+            document.getElementById('selectAllCoins').addEventListener('change', (e) => {
+                const symbolSelect = document.getElementById('symbol');
+                const symbolGroup = document.getElementById('symbol-custom-group');
+                symbolSelect.disabled = e.target.checked;
+                if (e.target.checked) {
+                    symbolGroup.style.display = 'none';
+                }
+            });
+
+        }
+
+        // ===== GRAB ATTENTION WHEN MINIMIZED / ON ANOTHER TAB =====
+        // No browser permission popups needed. When this tab isn't visible
+        // (minimized, or you're working in another window/tab), we try to
+        // bring it to the front and force a blocking alert() box on screen,
+        // change the tab title, and flash the taskbar/dock icon.
+        function grabAttention(alert_obj, signal, price, type = 'ema-cross') {
+            if (!document.hidden) return; // tab already visible - the in-page popup is enough
+
+            const label = signal === 'bullish' ? '📈 BULLISH' : '📉 BEARISH';
+            const typeLabel = type === 'price-cross' ? ' (Candle Crossed Both EMAs)' : '';
+            document.title = `🚨 ${label} ${alert_obj.symbol} - EMA Alert!`;
+
+            try { window.focus(); } catch (e) { /* ignore */ }
+
+            const message =
+                `${label} SIGNAL${typeLabel}!\n\n` +
+                `Pair: ${alert_obj.symbol}\n` +
+                `Timeframe: ${alert_obj.timeframe.toUpperCase()}\n` +
+                `EMA: ${alert_obj.ema1}/${alert_obj.ema2}\n` +
+                `Price: $${price.toFixed(2)}\n` +
+                `Time: ${new Date().toLocaleTimeString()}`;
+
+            // alert() is a blocking dialog - most browsers/OSes will flash the
+            // taskbar/dock icon and switch to this window so you can see it.
+            alert(message);
+        }
+
+        // All non-custom coin pairs currently offered in the dropdown
+        function getAllCoinSymbols() {
+            return Array.from(document.getElementById('symbol').options)
+                .map(opt => opt.value)
+                .filter(v => v && v !== 'custom');
+        }
+
+        // ===== ADD ALERT =====
+        function addAlert() {
+            const ema1Elem = document.getElementById('ema1');
+            let ema1 = ema1Elem.value;
+
+            if (ema1 === 'custom') {
+                ema1 = parseInt(document.getElementById('ema1-custom').value);
+                if (!ema1) {
+                    alert('Please enter EMA 1 value');
+                    return;
+                }
+            } else {
+                ema1 = parseInt(ema1);
+            }
+
+            const ema2Elem = document.getElementById('ema2');
+            let ema2 = ema2Elem.value;
+
+            if (ema2 === 'custom') {
+                ema2 = parseInt(document.getElementById('ema2-custom').value);
+                if (!ema2) {
+                    alert('Please enter EMA 2 value');
+                    return;
+                }
+            } else {
+                ema2 = parseInt(ema2);
+            }
+
+            const timeframe = document.getElementById('timeframe').value;
+            const marketType = document.getElementById('marketType').value;
+            const enablePopup = document.getElementById('enablePopup').checked;
+            const enableSound = document.getElementById('enableSound').checked;
+            const selectAllCoins = document.getElementById('selectAllCoins').checked;
+
+            const commonSettings = { ema1, ema2, timeframe, marketType, enablePopup, enableSound };
+
+            let symbolsToAdd = [];
+
+            if (selectAllCoins) {
+                // Add every coin in the dropdown as its own alert
+                symbolsToAdd = getAllCoinSymbols();
+            } else {
+                let symbol = document.getElementById('symbol').value;
+
+                if (symbol === 'custom') {
+                    symbol = document.getElementById('symbol-custom').value.trim().toUpperCase();
+                    if (!symbol) {
+                        alert('Please enter a custom trading pair');
+                        return;
+                    }
+                }
+
+                if (!symbol) {
+                    alert('Please select a trading pair');
+                    return;
+                }
+
+                symbolsToAdd = [symbol];
+            }
+
+            let addedCount = 0;
+            symbolsToAdd.forEach(symbol => {
+                // Skip if an identical alert already exists
+                const duplicate = alerts.some(a =>
+                    a.symbol === symbol &&
+                    a.ema1 === commonSettings.ema1 &&
+                    a.ema2 === commonSettings.ema2 &&
+                    a.timeframe === commonSettings.timeframe &&
+                    a.marketType === commonSettings.marketType
+                );
+                if (duplicate) return;
+
+                const alert_obj = {
+                    id: Date.now().toString() + '-' + symbol,
+                    symbol,
+                    ema1: commonSettings.ema1,
+                    ema2: commonSettings.ema2,
+                    timeframe: commonSettings.timeframe,
+                    marketType: commonSettings.marketType,
+                    enablePopup: commonSettings.enablePopup,
+                    enableSound: commonSettings.enableSound,
+                    active: true,
+                    createdAt: new Date().toLocaleString(),
+                    lastSignal: null,
+                    lastEma1: null,
+                    lastEma2: null
+                };
+
+                alerts.push(alert_obj);
+                startMonitoring(alert_obj);
+                addedCount++;
+                console.log(`✅ Alert added: ${symbol} EMA ${commonSettings.ema1}/${commonSettings.ema2}`);
+            });
+
+            saveToStorage();
+            renderAlerts();
+
+            if (addedCount === 0) {
+                alert('These alert(s) already exist.');
+            }
+
+            // Reset form
+            document.getElementById('symbol').value = '';
+            document.getElementById('symbol').disabled = false;
+            document.getElementById('symbol-custom').value = '';
+            document.getElementById('symbol-custom-group').style.display = 'none';
+            document.getElementById('selectAllCoins').checked = false;
+            document.getElementById('ema1').value = '9';
+            document.getElementById('ema2').value = '21';
+        }
+
+        // ===== MONITORING =====
+        function startMonitoring(alert_obj) {
+            const key = `${alert_obj.id}`;
+            
+            // Clear existing interval
+            if (alertIntervals[key]) {
+                clearInterval(alertIntervals[key]);
+            }
+
+            // Initial check
+            checkEmaSignal(alert_obj);
+
+            // Set interval based on timeframe
+            const interval = getIntervalTime(alert_obj.timeframe);
+            alertIntervals[key] = setInterval(() => {
+                if (alerts.find(a => a.id === alert_obj.id && a.active)) {
+                    checkEmaSignal(alert_obj);
+                }
+            }, interval);
+        }
+
+        function getIntervalTime(timeframe) {
+            const times = {
+                '1m': 10000,  // Check every 10 seconds for 1m
+                '3m': 30000,
+                '5m': 30000,
+                '15m': 60000,
+                '30m': 120000,
+                '1h': 300000,
+                '2h': 600000,
+                '4h': 900000,
+                '6h': 1200000,
+                '1d': 3600000
+            };
+            return times[timeframe] || 60000;
+        }
+
+        async function checkEmaSignal(alert_obj) {
+            try {
+                const endpoint = alert_obj.marketType === 'futures'
+                    ? 'https://fapi.binance.com/fapi/v1/klines'
+                    : 'https://api.binance.com/api/v3/klines';
+
+                const params = new URLSearchParams({
+                    symbol: alert_obj.symbol,
+                    interval: alert_obj.timeframe,
+                    limit: Math.max(alert_obj.ema1, alert_obj.ema2) + 50
+                });
+
+                const response = await fetch(`${endpoint}?${params}`);
+                const klines = await response.json();
+
+                if (Array.isArray(klines) && klines.length > 0) {
+                    const closes = klines.map(k => parseFloat(k[4]));
+                    const currentPrice = closes[closes.length - 1];
+                    
+                    const ema1Value = calculateEMA(closes, alert_obj.ema1);
+                    const ema2Value = calculateEMA(closes, alert_obj.ema2);
+
+                    if (ema1Value && ema2Value) {
+                        detectCrossover(alert_obj, ema1Value, ema2Value, currentPrice);
+                        detectPriceCrossBothEma(alert_obj, ema1Value, ema2Value, currentPrice);
+                    }
+                }
+            } catch (error) {
+                console.error(`Error checking signal for ${alert_obj.symbol}:`, error);
+            }
+        }
+
+        function calculateEMA(prices, period) {
+            if (prices.length < period) return null;
+
+            let ema = 0;
+            const multiplier = 2 / (period + 1);
+
+            // SMA for first EMA
+            for (let i = 0; i < period; i++) {
+                ema += prices[i];
+            }
+            ema = ema / period;
+
+            // Calculate remaining EMAs
+            for (let i = period; i < prices.length; i++) {
+                ema = (prices[i] - ema) * multiplier + ema;
+            }
+
+            return ema;
+        }
+
+        function detectCrossover(alert_obj, ema1, ema2, price) {
+            const fastAboveSlowNow = ema1 > ema2;
+            const lastState = localStorage.getItem(`alert-${alert_obj.id}-state`);
+
+            if (lastState) {
+                const lastFastAboveSlowNow = lastState === 'bullish';
+                
+                // Crossover detected
+                if (fastAboveSlowNow !== lastFastAboveSlowNow) {
+                    const signal = fastAboveSlowNow ? 'bullish' : 'bearish';
+                    triggerSignal(alert_obj, signal, price, ema1, ema2);
+                }
+            }
+
+            // Store current state
+            localStorage.setItem(`alert-${alert_obj.id}-state`, fastAboveSlowNow ? 'bullish' : 'bearish');
+            alert_obj.lastEma1 = ema1;
+            alert_obj.lastEma2 = ema2;
+        }
+
+        // ===== CANDLE CLOSE CROSSING BOTH EMAs (as in screenshot) =====
+        // Fires when a candle CLOSES fully above both EMA lines (bullish)
+        // or fully below both EMA lines (bearish) — i.e. the candle body
+        // punches through both EMAs and closes on the other side.
+        function detectPriceCrossBothEma(alert_obj, ema1, ema2, price) {
+            let currentSide = null;
+            if (price > ema1 && price > ema2) {
+                currentSide = 'above';
+            } else if (price < ema1 && price < ema2) {
+                currentSide = 'below';
+            }
+            // If price is sitting between the two EMAs, it hasn't fully
+            // crossed either one yet — wait for a clean close on one side.
+            if (currentSide === null) return;
+
+            const stateKey = `alert-${alert_obj.id}-price-cross-state`;
+            const lastSide = localStorage.getItem(stateKey);
+
+            if (lastSide && lastSide !== currentSide) {
+                const signal = currentSide === 'above' ? 'bullish' : 'bearish';
+                triggerSignal(alert_obj, signal, price, ema1, ema2, 'price-cross');
+            }
+
+            localStorage.setItem(stateKey, currentSide);
+        }
+
+        function triggerSignal(alert_obj, signal, price, ema1, ema2, type = 'ema-cross') {
+            console.log(`🎯 ${signal.toUpperCase()} (${type}) Signal: ${alert_obj.symbol} @ ${price}`);
+
+            // Add to history
+            history.unshift({
+                id: Date.now().toString(),
+                pair: alert_obj.symbol,
+                signal,
+                type,
+                price,
+                ema1: ema1.toFixed(2),
+                ema2: ema2.toFixed(2),
+                time: new Date(),
+                timeframe: alert_obj.timeframe
+            });
+            if (history.length > 100) history.pop();
+            signalsToday++;
+
+            saveToStorage();
+            renderAlerts();
+            renderHistory();
+
+            // Sound alert
+            if (alert_obj.enableSound) {
+                playAlertSound(signal);
+            }
+
+            // In-page popup (visible when the window is open/visible)
+            if (alert_obj.enablePopup) {
+                showAlertPopup(alert_obj, signal, price, ema1, ema2, type);
+            }
+
+            // OS-level attention grabber — brings the tab forward and shows a
+            // blocking alert() popup even if the window is minimized or you
+            // can't hear the alarm sound. No browser permission needed.
+            if (alert_obj.enablePopup) {
+                grabAttention(alert_obj, signal, price, type);
+            }
+        }
+
+        function playAlertSound(signal) {
+            // If running inside the Android app and the user has picked a
+            // phone tone, play that instead of the browser beep.
+            if (isNativeApp()) {
+                const plugin = getAlarmSoundPlugin();
+                const uri = localStorage.getItem('alarm-tone-uri');
+                if (plugin && uri) {
+                    plugin.playSound({ uri }).catch(e => console.log('Native tone playback failed:', e));
+                    return;
+                }
+            }
+
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+
+                if (signal === 'bullish') {
+                    // 3 beeps for bullish
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            oscillator.frequency.value = 800 + (i * 100);
+                            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.2);
+                        }, i * 300);
+                    }
+                } else {
+                    // 2 lower beeps for bearish
+                    for (let i = 0; i < 2; i++) {
+                        setTimeout(() => {
+                            oscillator.frequency.value = 400 - (i * 100);
+                            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.2);
+                        }, i * 300);
+                    }
+                }
+            } catch (e) {
+                console.log('Audio not available');
+            }
+        }
+
+        // ===== POPUP ALERT =====
+        function showAlertPopup(alert_obj, signal, price, ema1, ema2, type = 'ema-cross') {
+            const popup = document.getElementById('alert-popup');
+            const overlay = document.getElementById('popup-overlay');
+
+            // Update content
+            const typeSuffix = type === 'price-cross' ? ' — CANDLE CLOSED THROUGH BOTH EMAs' : '';
+            const title = (signal === 'bullish' ? '📈 BULLISH SIGNAL' : '📉 BEARISH SIGNAL') + typeSuffix;
+            const icon = signal === 'bullish' ? '📈' : '📉';
+            const action = signal === 'bullish' ? '🟢 BUY' : '🔴 SELL';
+
+            document.getElementById('popup-icon').textContent = icon;
+            document.getElementById('popup-title').textContent = title;
+            document.getElementById('popup-pair').textContent = alert_obj.symbol;
+            document.getElementById('popup-timeframe').textContent = alert_obj.timeframe.toUpperCase();
+            document.getElementById('popup-price').textContent = `$${price.toFixed(2)}`;
+            document.getElementById('popup-ema').textContent = `EMA ${alert_obj.ema1}/${alert_obj.ema2}`;
+            document.getElementById('popup-action').textContent = action;
+            document.getElementById('popup-time').textContent = new Date().toLocaleTimeString();
+
+            // Update styling
+            popup.className = `alert-popup ${signal}`;
+
+            // Show overlay
+            overlay.classList.add('show');
+
+            // Auto-close after 10 seconds
+            setTimeout(() => {
+                if (overlay.classList.contains('show')) {
+                    closePopup();
+                }
+            }, 10000);
+
+            // Request focus
+            window.focus();
+        }
+
+        function closePopup() {
+            document.getElementById('popup-overlay').classList.remove('show');
+        }
+
+        function acknowledgeAlert() {
+            closePopup();
+        }
+
+        // ===== RENDERING =====
+        function renderAlerts() {
+            const tbody = document.getElementById('alerts-tbody');
+            const count = document.getElementById('alerts-count');
+            const activeCount = alerts.filter(a => a.active).length;
+
+            document.getElementById('total-alerts').textContent = alerts.length;
+            document.getElementById('active-alerts').textContent = activeCount;
+            document.getElementById('signals-today').textContent = signalsToday;
+
+            count.textContent = alerts.length;
+
+            if (alerts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;"><div class="empty-state-icon">🚀</div><p>No alerts yet. Add one to get started!</p></td></tr>';
+                document.getElementById('select-all-alerts').checked = false;
+                return;
+            }
+
+            tbody.innerHTML = alerts.map(alert_obj => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="alert-select" data-id="${alert_obj.id}">
+                    </td>
+                    <td>
+                        <span class="pair-name">${alert_obj.symbol}</span>
+                    </td>
+                    <td>
+                        <div class="ema-display">
+                            EMA ${alert_obj.ema1}/${alert_obj.ema2}
+                            ${alert_obj.lastEma1 ? `<br><small>${alert_obj.lastEma1.toFixed(2)} / ${alert_obj.lastEma2.toFixed(2)}</small>` : ''}
+                        </div>
+                    </td>
+                    <td>${alert_obj.timeframe.toUpperCase()}</td>
+                    <td>
+                        <span class="badge ${alert_obj.marketType === 'spot' ? 'badge-spot' : 'badge-futures'}">
+                            ${alert_obj.marketType.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${alert_obj.active ? 'badge-active' : 'badge-paused'}">
+                            ${alert_obj.active ? '🟢 Active' : '🔴 Paused'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-small btn-toggle" onclick="toggleAlert('${alert_obj.id}')">
+                                ${alert_obj.active ? '⏸' : '▶'}
+                            </button>
+                            <button class="btn-small btn-delete" onclick="deleteAlert('${alert_obj.id}')">
+                                🗑
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Update last signal time
+            if (history.length > 0) {
+                const lastTime = history[0].time.toLocaleTimeString();
+                document.getElementById('last-signal-time').textContent = lastTime;
+            }
+        }
+
+        function renderHistory() {
+            const historyList = document.getElementById('history-list');
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="no-history">No signals triggered yet</div>';
+                return;
+            }
+
+            historyList.innerHTML = history.slice(0, 10).map(item => `
+                <div class="history-item ${item.signal}">
+                    <div>
+                        <div class="history-signal ${item.signal}">
+                            ${item.signal === 'bullish' ? '📈 BULLISH' : '📉 BEARISH'}${item.type === 'price-cross' ? ' <small style="opacity:.75;">(Candle × Both EMAs)</small>' : ''}
+                        </div>
+                        <div style="color: var(--text-dim); font-size: 0.9rem;">
+                            ${item.pair} @ ${item.timeframe}
+                        </div>
+                        <div style="color: var(--text); font-weight: 600; margin-top: 0.25rem;">
+                            Price: $${item.price.toFixed(2)} | EMA: ${item.ema1}/${item.ema2}
+                        </div>
+                        <div class="history-time">${item.time.toLocaleString()}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleAlert(id) {
+            const alert_obj = alerts.find(a => a.id === id);
+            if (alert_obj) {
+                alert_obj.active = !alert_obj.active;
+                saveToStorage();
+                if (alert_obj.active) {
+                    startMonitoring(alert_obj);
+                } else {
+                    clearInterval(alertIntervals[id]);
+                }
+                renderAlerts();
+            }
+        }
+
+        function deleteAlert(id) {
+            if (confirm('Delete this alert?')) {
+                alerts = alerts.filter(a => a.id !== id);
+                clearInterval(alertIntervals[id]);
+                saveToStorage();
+                renderAlerts();
+            }
+        }
+
+        // ===== BULK SELECT / DELETE ALERTS =====
+        function toggleSelectAllAlerts(checkbox) {
+            document.querySelectorAll('.alert-select').forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+        }
+
+        function deleteSelectedAlerts() {
+            const selected = Array.from(document.querySelectorAll('.alert-select:checked'))
+                .map(cb => cb.getAttribute('data-id'));
+
+            if (selected.length === 0) {
+                alert('Please select at least one coin/alert to delete.');
+                return;
+            }
+
+            if (confirm(`Delete ${selected.length} selected alert(s)?`)) {
+                selected.forEach(id => clearInterval(alertIntervals[id]));
+                alerts = alerts.filter(a => !selected.includes(a.id));
+                saveToStorage();
+                renderAlerts();
+            }
+        }
+
+        // ===== HISTORY =====
+        function clearHistory() {
+            if (history.length === 0) return;
+            if (confirm('Clear all alert history? This cannot be undone.')) {
+                history = [];
+                saveToStorage();
+                renderHistory();
+                document.getElementById('last-signal-time').textContent = '--:--';
+            }
+        }
+
+        // ===== STORAGE =====
+        function saveToStorage() {
+            localStorage.setItem('desktop-alerts', JSON.stringify(alerts));
+            localStorage.setItem('alerts-history', JSON.stringify(
+                history.map(h => ({...h, time: h.time.toISOString()}))
+            ));
+        }
+
+        function loadFromStorage() {
+            const stored = localStorage.getItem('desktop-alerts');
+            const storedHistory = localStorage.getItem('alerts-history');
+
+            if (stored) {
+                alerts = JSON.parse(stored);
+            }
+
+            if (storedHistory) {
+                history = JSON.parse(storedHistory).map(h => ({
+                    ...h,
+                    time: new Date(h.time)
+                }));
+            }
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
